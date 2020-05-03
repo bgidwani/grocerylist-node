@@ -19,5 +19,7 @@ app.get('/', (req, res) => {
 // note this is after all good routes and is not an error handler
 // to get a 404, it has to fall through to this route - no error involved
 app.use(function (req, res) {
-    res.status(404).send('<h3 style=color:red>You seem to be lost. What are you trying to find here?<h3>');
+    var message = '<h3 style=color:red>You seem to be lost. What are you trying to find here?</h3>';
+    message += `<div><strong>Requested Url:</strong> ${req.originalUrl}</div>`;
+    res.status(404).send(message);
 });
