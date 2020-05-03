@@ -1,0 +1,6 @@
+**/node_modules
+**/.env
+**/yarn-error.log
+.DS_Store
+**/.DS_Store
+**/functions/

@@ -1,0 +1,38 @@
+{
+    "name": "grocerylist",
+    "version": "1.0.0",
+    "description": "Manage grocery list items using Nodejs",
+    "main": "index.js",
+    "author": "Bharat Gidwani",
+    "license": "MIT",
+    "scripts": {
+        "start": "nodemon index.js",
+        "format": "pretty-quick ",
+        "build:lambda": "netlify-lambda build app"
+    },
+    "keywords": [
+        "netlify",
+        "express.js",
+        "jwt",
+        "nodejs"
+    ],
+    "dependencies": {
+        "@hapi/joi": "^17.1.1",
+        "body-parser": "^1.19.0",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "serverless-http": "^2.3.2"
+    },
+    "devDependencies": {
+        "netlify-lambda": "^1.6.3",
+        "husky": "^4.2.5",
+        "nodemon": "^2.0.3",
+        "prettier": "^2.0.5",
+        "pretty-quick": "^2.0.1"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged"
+        }
+    }
+}

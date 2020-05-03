@@ -1,0 +1,9 @@
+[build]
+  functions = "functions"
+  Command = "yarn run build:lambda"
+
+[dev]
+  command = "yarn start" # Command to start your dev server
+  port = 8888 # Port that the dev server will be accessible on
+  targetPort = 3000 # Port of target app server
+  autoLaunch = true # a Boolean value that determines if Netlify Dev launches the local server address in your browser
