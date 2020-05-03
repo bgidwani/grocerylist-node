@@ -20,8 +20,5 @@ app.use(urlencodedParser);
 // routes
 app.use('/', routes);
 
-// handle the route generated in netlify
-app.use('/.netlify/functions/server', routes);  // path must route to lambda
-
 module.exports = app;
 module.exports.handler = serverless(app);
