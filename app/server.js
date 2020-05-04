@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const serverless = require('serverless-http');
 const cors = require('cors');
+const utils = require('./lib');
 
 //initialize the server
 const app = express();
@@ -26,7 +27,7 @@ router.use('/users', authRoute);
 
 //Routes for home page
 router.get('/', (req, res) => {
-    res.send('<h1>Welcome to the site</h1>');
+    utils.response.sendSuccess(res, '<h1>Welcome to the site</h1>');
 });
 
 app.use(
@@ -46,7 +47,8 @@ app.use(function (req, res) {
     var message =
         '<h3 style=color:red>You seem to be lost. What are you trying to find here?</h3>';
     message += `<div><strong>Requested Url:</strong> ${req.originalUrl}</div>`;
-    res.status(404).send(message);
+
+    utils.response.sendNotFound(message);
 });
 
 module.exports = app;
