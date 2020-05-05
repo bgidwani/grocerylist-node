@@ -10,5 +10,5 @@ const port = process.env.SERVER_PORT || 3050;
 
 // listen for incoming requests
 app.listen(port, () => {
-    console.log('Server is up and listening on port', port);
+    console.info(' => Server is up and listening on port [%s]', port);
 });

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const serverless = require('serverless-http');
 const cors = require('cors');
 const utils = require('./lib');
+const acl = require('./middleware/acl');
 
 //initialize the server
 const app = express();
@@ -21,13 +22,17 @@ app.use(urlencodedParser);
 
 //import routes
 const authRoute = require('./auth/routes');
+const listRoute = require('./lists/routes');
 
-// Login route
+// Login routes
 router.use('/users', authRoute);
+
+// Grocery list routes
+router.use('/list', acl.token.validate, listRoute);
 
 //Routes for home page
 router.get('/', (req, res) => {
-    utils.response.sendSuccess(res, '<h1>Welcome to the site</h1>');
+    utils.response.sendSuccessText(res, '<h1>Welcome to the site</h1>');
 });
 
 app.use(
@@ -48,7 +53,7 @@ app.use(function (req, res) {
         '<h3 style=color:red>You seem to be lost. What are you trying to find here?</h3>';
     message += `<div><strong>Requested Url:</strong> ${req.originalUrl}</div>`;
 
-    utils.response.sendNotFound(message);
+    utils.response.sendNotFoundText(res, message);
 });
 
 module.exports = app;

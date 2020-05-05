@@ -9,6 +9,14 @@ const sendError = (res, status, errortext) => {
     });
 };
 
+const sendNotSupportedError = (req, res) => {
+    return res.status(HTTP_STATUS_CODES.NOT_IMPLEMENTED).send('Not supported');
+};
+
+const sendUnAuthorizedError = (res, errorText) => {
+    return sendError(res, HTTP_STATUS_CODES.UNAUTHORIZED, errorText);
+};
+
 const sendInternalError = (res, errorText) => {
     return sendError(res, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, errorText);
 };
@@ -21,23 +29,35 @@ const sendNotFound = (res, errortext) => {
     return sendError(res, HTTP_STATUS_CODES.NOT_FOUND, errortext);
 };
 
-const sendjson = (res, status, bodytext) => {
+const sendjson = (res, status, body) => {
     return res.status(status).json({
         status: status,
-        message: bodytext,
+        data: body,
     });
 };
 
-const sendSuccess = (res, bodytext) => {
-    return sendjson(res, HTTP_STATUS_CODES.OK, bodytext);
+const sendSuccess = (res, body) => {
+    return sendjson(res, HTTP_STATUS_CODES.OK, body);
+};
+
+const sendSuccessText = (res, body) => {
+    return res.status(HTTP_STATUS_CODES.OK).send(body);
+};
+
+const sendNotFoundText = (res, body) => {
+    return res.status(HTTP_STATUS_CODES.NOT_FOUND).send(body);
 };
 
 module.exports = {
     HTTP_STATUS_CODES,
+    sendSuccessText,
+    sendNotFoundText,
     sendjson,
     sendSuccess,
     sendError,
     sendInternalError,
     sendBadRequest,
     sendNotFound,
+    sendUnAuthorizedError,
+    sendNotSupportedError,
 };

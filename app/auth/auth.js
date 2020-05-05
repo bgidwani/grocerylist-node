@@ -1,6 +1,8 @@
 'use strict';
 
 const utils = require('../lib');
+const acl = require('../middleware/acl');
+
 const { validateLogin } = require('./lib/validations');
 const { comparePassword } = require('./lib/password-hasher');
 
@@ -30,10 +32,16 @@ const login = async (req, res) => {
                 return utils.response.sendNotFound(res, 'Invalid credentials');
             }
 
-            return utils.response.sendSuccess(res, 'Success');
+            //generate and return a new token
+            var token = acl.token.generate(user._id);
+            var data = {
+                token: token,
+                message: 'Login success',
+            };
+            return utils.response.sendSuccess(res, data);
         });
     } catch (err) {
-        console.error(err);
+        console.error('=> Login [%s]', err.message);
         return utils.response.sendInternalError(res, err.message);
     }
 };
