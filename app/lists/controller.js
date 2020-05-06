@@ -48,4 +48,23 @@ const retrieve = {
     },
 };
 
-module.exports = { getAll, create, retrieve };
+const remove = async (req, res) => {
+    // item id is extracted and stored on locals by middleware
+    const id = res.locals.groceryitemid;
+
+    var message = await utils.db.executeWithDbContext(async () => {
+        const dbResponse = await GroceryList.findByIdAndDelete(id);
+
+        if (dbResponse) {
+            return utils.response.sendSuccess(res, 'Done');
+        } else {
+            return utils.response.sendNotFound(res, 'Invalid item');
+        }
+    });
+
+    if (message !== true) {
+        return utils.response.sendInternalError(res, message);
+    }
+};
+
+module.exports = { getAll, create, retrieve, remove };
