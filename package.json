@@ -8,7 +8,11 @@
     "scripts": {
         "start": "nodemon index.js",
         "format": "pretty-quick ",
-        "build:lambda": "netlify-lambda build app"
+        "build:lambda": "netlify-lambda build app",
+        "test": "mocha"
+    },
+    "directories": {
+        "test": "./test"
     },
     "keywords": [
         "netlify",
@@ -28,11 +32,14 @@
         "serverless-http": "^2.3.2"
     },
     "devDependencies": {
+        "chai": "^4.2.0",
         "husky": "^4.2.5",
+        "mocha": "^7.1.2",
         "netlify-lambda": "^1.6.3",
         "nodemon": "^2.0.3",
         "prettier": "^2.0.5",
-        "pretty-quick": "^2.0.1"
+        "pretty-quick": "^2.0.1",
+        "supertest": "^4.0.2"
     },
     "husky": {
         "hooks": {

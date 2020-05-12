@@ -17,15 +17,22 @@ const listSchema = mongoose.Schema({
                 min: 2,
                 max: 255,
             },
-            addDate: {
-                type: Date,
-                default: Date.now,
+            quantity: {
+                type: Number,
+                default: 1,
+            },
+            bought: {
+                type: Boolean,
+                default: false,
             },
         },
     ],
     createDate: {
         type: Date,
         default: Date.now,
+    },
+    updateDate: {
+        type: Date,
     },
 });
 
