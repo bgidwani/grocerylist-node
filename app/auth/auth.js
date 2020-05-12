@@ -21,7 +21,6 @@ const signup = async (req, res) => {
     const { error } = validateSignup(req.body);
     if (error) {
         return utils.response.sendBadRequest(res, error.details[0].message);
-        //return res.status(400).send(error.details[0].message);
     }
 
     const encryptedPassword = await encryptPassword(req.body.password);

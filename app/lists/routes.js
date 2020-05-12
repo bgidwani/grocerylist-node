@@ -12,4 +12,8 @@ app.param('listId', listmiddleware.getParam);
 // Routes
 app.route('/').get(list.getAll).post(list.create);
 
-app.route('/:listId').get(list.retrieve.byID).delete(list.remove);
+app.route('/:listId')
+    .get(list.retrieve.byID)
+    .put(list.update)
+    .patch(list.patch)
+    .delete(list.remove);

@@ -1,5 +1,5 @@
-process.env.DB_CONNECT = 'mongodb://172.17.0.2:27017/testgrocerylist';
-process.env.TOKEN_SECRET = 'testkey';
+const testconfig = require('./config');
+testconfig.init();
 
 const db = require('../app/lib/db');
 const request = require('supertest');
