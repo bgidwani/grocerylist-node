@@ -52,7 +52,7 @@ describe('Users route related tests', () => {
                     await utils.request
                         .post(route, {
                             name: name,
-                            password: 'pass1234',
+                            password: 'test1234',
                             email: 'test@123.com',
                         })
                         .expect(httpStatusCodes.BAD_REQUEST);
@@ -71,7 +71,7 @@ describe('Users route related tests', () => {
                     await utils.request
                         .post(route, {
                             name: 'test',
-                            password: 'pass1234',
+                            password: 'test1234',
                             email: email,
                         })
                         .expect(httpStatusCodes.BAD_REQUEST);
@@ -93,9 +93,9 @@ describe('Users route related tests', () => {
 
             it('should be able to register a user', () => {
                 const data = {
-                    name: 'Bharat Gidwani',
-                    email: 'bharat@mailinator.com',
-                    password: 'pass1234',
+                    name: 'Test User',
+                    email: 'test@mailinator.com',
+                    password: 'test1234',
                 };
                 return utils.request
                     .post(route, data)
@@ -104,9 +104,9 @@ describe('Users route related tests', () => {
 
             it('should not allow duplicate user', async () => {
                 const data = {
-                    name: 'Bharat Gidwani',
-                    email: 'bharat@mailinator.com',
-                    password: 'pass1234',
+                    name: 'Test User',
+                    email: 'test@mailinator.com',
+                    password: 'test1234',
                 };
                 await utils.request
                     .post(route, data)
@@ -149,7 +149,7 @@ describe('Users route related tests', () => {
                     await utils.request
                         .post(route, {
                             name: 'test',
-                            password: 'pass1234',
+                            password: 'test1234',
                             email: email,
                         })
                         .expect(httpStatusCodes.BAD_REQUEST);
@@ -171,9 +171,9 @@ describe('Users route related tests', () => {
 
             it.skip('should be able to login', async () => {
                 const data = {
-                    name: 'Bharat Gidwani',
-                    email: 'bharat@mailinator.com',
-                    password: 'pass1234',
+                    name: 'Test User',
+                    email: 'test@mailinator.com',
+                    password: 'test',
                 };
 
                 //create the user
@@ -196,9 +196,9 @@ describe('Users route related tests', () => {
 
             it.skip('should not allow invalid credentials', async () => {
                 const data = {
-                    name: 'Bharat Gidwani',
-                    email: 'bharat@mailinator.com',
-                    password: 'pass1234',
+                    name: 'Test User',
+                    email: 'test@mailinator.com',
+                    password: 'test',
                 };
 
                 //create the user

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 let isConnected;
 
-const connectDb = () => {
+const connectDb = async () => {
     if (isConnected) {
         console.info('=> Connect Db - Reusing database connection');
-        return Promise.resolve();
+        return;
     }
 
     const options = {
@@ -13,23 +13,22 @@ const connectDb = () => {
         useUnifiedTopology: true,
     };
 
-    console.info('=> Connect Db - Connecting to database');
-    return mongoose.connect(process.env.DB_CONNECT, options).then((db) => {
-        isConnected = db.connections[0].readyState;
-    });
+    // console.info('=> Connect Db - Connecting to database');
+    var db = await mongoose.connect(process.env.DB_CONNECT, options);
+    isConnected = db.connections[0].readyState;
 };
 
-const disconnectDb = () => {
+const disconnectDb = async () => {
     if (!isConnected) {
-        return Promise.resolve();
+        return;
     }
 
-    return mongoose.disconnect().then(() => {
-        isConnected = false;
-    });
+    //console.log('Disconnecting db connection');
+    await mongoose.disconnect();
+    isConnected = false;
 };
 
-const executeWithDbContext = async (callback) => {
+const executeWithDbContext = async (callback, raiseerror) => {
     try {
         await connectDb();
 
@@ -38,7 +37,11 @@ const executeWithDbContext = async (callback) => {
         return true;
     } catch (err) {
         console.error(' => executeWithDbContext [%s]', err.message);
-        return err.message;
+        if (raiseerror) {
+            throw err;
+        } else {
+            return err.message;
+        }
     } finally {
         await disconnectDb();
     }
