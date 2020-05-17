@@ -4,8 +4,11 @@ const request = require('supertest');
 const app = require('../../app/server.js');
 const acl = require('../../app/middleware/acl');
 
-const testUserId = '12345';
+const testUserId = '5eb975527774bc1cd842965d';
 const testToken = acl.token.generate(testUserId);
+
+const testUserId2 = '5ec0be4b3eafee3df9f80c0d';
+const testToken2 = acl.token.generate(testUserId2);
 
 // a helper function to make a POST request.
 const setHeaders = (request, token) => {
@@ -73,12 +76,20 @@ const authget = (url) => {
     return internalGet(url, testToken);
 };
 
+const authget_user2 = (url) => {
+    return internalGet(url, testToken2);
+};
+
 const authpost = (url, body) => {
     return internalPost(url, body, testToken);
 };
 
 const authput = (url, body) => {
     return internalPut(url, body, testToken);
+};
+
+const authput_user2 = (url, body) => {
+    return internalPut(url, body, testToken2);
 };
 
 const authpatch = (url, body) => {
@@ -89,6 +100,10 @@ const authdel = (url) => {
     return internalDelete(url, testToken);
 };
 
+const authdel_user2 = (url) => {
+    return internalDelete(url, testToken2);
+};
+
 module.exports = {
     get,
     post,
@@ -96,8 +111,12 @@ module.exports = {
     put,
     del,
     authget,
+    authget_user2,
     authpost,
     authpatch,
     authput,
+    authput_user2,
     authdel,
+    authdel_user2,
+    testUserId,
 };

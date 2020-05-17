@@ -11,6 +11,8 @@ const connectDb = async () => {
     const options = {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false, //done to use findOneAndDelete() method on mongo collection
     };
 
     // console.info('=> Connect Db - Connecting to database');

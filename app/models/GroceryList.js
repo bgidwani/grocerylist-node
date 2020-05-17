@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const listSchema = mongoose.Schema({
     name: {
@@ -8,6 +9,12 @@ const listSchema = mongoose.Schema({
         required: true,
         min: 6,
         max: 255,
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+        index: true,
     },
     items: [
         {

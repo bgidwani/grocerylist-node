@@ -27,8 +27,7 @@ describe('Grocery List route related tests', () => {
             await GroceryList.deleteMany({});
 
             // seed data
-            const newList = new GroceryList();
-            newList.name = testListName;
+            const newList = createDbGroceryList(testListName, null);
 
             const response = await newList.save();
             //console.log(response);
@@ -40,6 +39,23 @@ describe('Grocery List route related tests', () => {
     afterEach(async () => {
         sinon.restore();
     });
+
+    const createDbGroceryList = (listName, listItems, listUpdateDate) => {
+        let newList = new GroceryList({
+            name: listName,
+            user: utils.request.testUserId,
+        });
+
+        if (listItems) {
+            newList.items = listItems;
+        }
+
+        if (listUpdateDate) {
+            newList.updateDate = listUpdateDate;
+        }
+
+        return newList;
+    };
 
     context('Home - /list route', () => {
         const route = '/list';
@@ -66,6 +82,23 @@ describe('Grocery List route related tests', () => {
                             );
 
                         expect(dbData[0].name).to.be.eq(testListName);
+                    });
+            });
+
+            it('should not return data for a different user', () => {
+                return utils.request
+                    .authget_user2(route)
+                    .expect(httpStatusCodes.OK)
+                    .expect((res) => {
+                        //console.log(res.body.data);
+                        var dbData = res.body.data;
+                        expect(dbData).to.exist;
+                        expect(dbData)
+                            .to.be.an('array', 'Returned data should be array')
+                            .that.has.lengthOf(
+                                0,
+                                'No seeded data should be returned for user 2'
+                            );
                     });
             });
         });
@@ -113,6 +146,45 @@ describe('Grocery List route related tests', () => {
                             newList.items.length
                         );
                     });
+            });
+
+            it('should create new list for current user only', async () => {
+                var newList = {
+                    name: 'Test List',
+                    items: [
+                        { name: 'Onion' },
+                        { name: 'Potato' },
+                        { name: 'Methi' },
+                    ],
+                };
+
+                await utils.request
+                    .authpost(route, newList)
+                    .expect(httpStatusCodes.OK);
+
+                //retrieve data for the current user
+                await utils.request.authget(route).expect((res) => {
+                    var dbData = res.body.data;
+                    expect(dbData).to.exist;
+                    expect(dbData)
+                        .to.be.an('array', 'Returned data should be array')
+                        .that.has.lengthOf(
+                            2,
+                            'Seeded data and new list should be returned'
+                        );
+                });
+
+                //retrieve data for the other user
+                await utils.request.authget_user2(route).expect((res) => {
+                    var dbData = res.body.data;
+                    expect(dbData).to.exist;
+                    expect(dbData)
+                        .to.be.an('array', 'Returned data should be array')
+                        .that.has.lengthOf(
+                            0,
+                            'No data should be returned for user2'
+                        );
+                });
             });
         });
     });
@@ -181,7 +253,7 @@ describe('Grocery List route related tests', () => {
             it('should return internal server error', () => {
                 const findByIdAndDeleteStub = sinon.stub(
                     GroceryList,
-                    'findByIdAndDelete'
+                    'findOneAndDelete'
                 );
                 findByIdAndDeleteStub.throwsException(
                     new Error('Error connecting to DB')
@@ -204,6 +276,12 @@ describe('Grocery List route related tests', () => {
 
                 await utils.request
                     .authget(route)
+                    .expect(httpStatusCodes.NOT_FOUND);
+            });
+
+            it('should not allow other users to delete the list', async () => {
+                await utils.request
+                    .authdel_user2(route)
                     .expect(httpStatusCodes.NOT_FOUND);
             });
         });
@@ -325,14 +403,14 @@ describe('Grocery List route related tests', () => {
                     let listForItemsContext = {};
                     let routeForItemsContext = '';
                     beforeEach(async () => {
-                        listForItemsContext = new GroceryList({
-                            name: 'Items collection list',
-                            items: [
+                        listForItemsContext = createDbGroceryList(
+                            'Items collection list',
+                            [
                                 { name: 'Potato', quantity: 1, bought: false },
                                 { name: 'Tomato', quantity: 1, bought: false },
                             ],
-                            updateDate: Date.now(),
-                        });
+                            Date.now()
+                        );
                         await db.executeWithDbContext(async () => {
                             let item = await listForItemsContext.save();
                             routeForItemsContext = `/list/${item._id}`;
@@ -379,15 +457,12 @@ describe('Grocery List route related tests', () => {
 
             context('[remove] operation', async () => {
                 it('should remove appropriate item from the list', async () => {
-                    var newList = new GroceryList({
-                        name: 'New Test List',
-                        items: [
-                            {
-                                name: 'Test Potato',
-                                quantity: 1,
-                            },
-                        ],
-                    });
+                    let newList = createDbGroceryList('New Test List', [
+                        {
+                            name: 'Test Potato',
+                            quantity: 1,
+                        },
+                    ]);
 
                     var listId = '';
                     await db.executeWithDbContext(async () => {
@@ -413,6 +488,70 @@ describe('Grocery List route related tests', () => {
                         expect(dbList.items.length).to.be.eq(0);
                     });
                 });
+            });
+        });
+
+        context('PUT method', () => {
+            it('should not allow unauthorized request', () => {
+                return utils.request
+                    .put(route, {})
+                    .expect(httpStatusCodes.UNAUTHORIZED);
+            });
+
+            it('should not allow empty body', () => {
+                return utils.request
+                    .authput(route, {})
+                    .expect(httpStatusCodes.BAD_REQUEST);
+            });
+
+            invalidListNames.forEach((invalidname) => {
+                it(`should not allow [${invalidname}] as list name in body`, () => {
+                    return utils.request
+                        .authput(route, { name: invalidname })
+                        .expect(httpStatusCodes.BAD_REQUEST);
+                });
+            });
+
+            it('should update the list with appropriate data', async () => {
+                const newName = testListName + '1';
+                let updatedList = {
+                    name: newName,
+                    items: [
+                        { name: 'Onion' },
+                        { name: 'Potato' },
+                        { name: 'Methi' },
+                    ],
+                };
+
+                await utils.request
+                    .authput(route, updatedList)
+                    .expect(httpStatusCodes.OK)
+                    .expect((res) => {
+                        //console.log(res.body);
+                        var data = res.body.data;
+                        expect(data).to.exist;
+                    });
+
+                await utils.request.authget(route).expect((res) => {
+                    var dbData = res.body.data;
+                    expect(dbData).to.exist;
+                    expect(dbData.name).to.be.eq(newName);
+                    expect(dbData.items).to.have.lengthOf(
+                        updatedList.items.length
+                    );
+                });
+            });
+
+            it('should update the list for current user only', async () => {
+                const newName = testListName + '1';
+                var updatedList = {
+                    name: newName,
+                    items: [{ name: 'Onion' }, { name: 'Potato' }],
+                };
+
+                await utils.request
+                    .authput_user2(route, updatedList)
+                    .expect(httpStatusCodes.NOT_FOUND);
             });
         });
     });

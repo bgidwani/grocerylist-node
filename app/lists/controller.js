@@ -14,6 +14,8 @@ const executeAndRespond = async (res, callback) => {
 
 const invalidIdError = 'Invalid Id specified';
 
+const userId = (req) => req.user.id;
+
 const findItemById = (id) => {
     return GroceryList.findById(id).select('-__v');
 };
@@ -21,7 +23,9 @@ const findItemById = (id) => {
 const getAll = async (req, res) => {
     //console.log('Executing list - getAll method');
     return executeAndRespond(res, async () => {
-        const items = await GroceryList.find().select('-__v');
+        const items = await GroceryList.find({ user: userId(req) }).select(
+            '-__v'
+        );
         return utils.response.sendSuccess(res, items);
     });
 };
@@ -36,6 +40,7 @@ const create = async (req, res) => {
     }
 
     var newList = new GroceryList();
+    newList.user = userId(req);
     newList.name = data.name;
     newList.items = data.items;
 
@@ -77,7 +82,7 @@ const update = async (req, res) => {
     const updatedList = {
         name: data.name,
         items: data.items,
-        updateDate: Date.now,
+        updateDate: Date.now(),
     };
 
     const { error } = validateList(updatedList);
@@ -87,15 +92,16 @@ const update = async (req, res) => {
     }
 
     return executeAndRespond(res, async () => {
-        const dbResponse = await GroceryList.updateOne(
-            { _id: id },
+        const dbResponse = await GroceryList.findOneAndUpdate(
+            { _id: id, user: userId(req) },
             updatedList
         );
 
-        if (dbResponse.ok) {
+        //console.log('Update', dbResponse);
+        if (dbResponse) {
             utils.response.sendSuccess(res, 'Success');
         } else {
-            utils.response.sendInternalError(res, dbResponse);
+            utils.response.sendNotFound(res, 'Invalid item');
         }
     });
 };
@@ -267,8 +273,12 @@ const remove = async (req, res) => {
     const id = res.locals.groceryitemid;
 
     var message = await utils.db.executeWithDbContext(async () => {
-        const dbResponse = await GroceryList.findByIdAndDelete(id);
+        const dbResponse = await GroceryList.findOneAndDelete({
+            _id: id,
+            user: userId(req),
+        });
 
+        //console.log('Delete', dbResponse);
         if (dbResponse) {
             return utils.response.sendSuccess(res, 'Success');
         } else {
