@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
-  Command = "yarn install && yarn run build:lambda"
+  Command = "yarn install && yarn test && yarn run build:lambda"
 
 [dev]
   command = "yarn start" # Command to start your dev server
