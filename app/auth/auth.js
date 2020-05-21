@@ -75,6 +75,9 @@ const login = async (req, res) => {
             return utils.response.sendNotFound(res, 'Invalid credentials');
         }
 
+        //track login
+        await utils.logger.track('login', user._id);
+
         //generate and return a new token
         var token = acl.token.generate(user._id);
         var data = {

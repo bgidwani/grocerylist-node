@@ -4,6 +4,7 @@ testconfig.init();
 const db = require('../app/lib/db');
 const httpStatusCodes = require('../app/lib/httpStatus');
 const GroceryList = require('../app/models/GroceryList');
+const Event = require('../app/models/Event');
 const utils = require('./utils');
 const chai = require('chai');
 const sinon = require('sinon');
@@ -25,6 +26,7 @@ describe('Grocery List route related tests', () => {
         //this.sandbox = sinon.sandbox.create();
         await db.executeWithDbContext(async () => {
             await GroceryList.deleteMany({});
+            await Event.deleteMany({});
 
             // seed data
             const newList = createDbGroceryList(testListName, null);

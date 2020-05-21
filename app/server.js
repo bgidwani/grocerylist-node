@@ -6,6 +6,7 @@ const serverless = require('serverless-http');
 const cors = require('cors');
 const utils = require('./lib');
 const acl = require('./middleware/acl');
+const uuid = require('uuid');
 
 //initialize the server
 const app = express();
@@ -30,6 +31,11 @@ app.use(
         origin: '*',
     })
 );
+
+app.use(function (req, res, next) {
+    req.id = uuid.v4();
+    next();
+});
 
 /// ================================================ ///
 ///               Route definitions

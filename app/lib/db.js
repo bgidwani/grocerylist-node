@@ -1,6 +1,8 @@
+'use strict';
+
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-let isConnected;
+let isConnected = false;
 
 const connectDb = async () => {
     if (isConnected) {
@@ -51,4 +53,10 @@ const executeWithDbContext = async (callback, raiseerror) => {
 
 const getNewId = () => new mongoose.mongo.ObjectID();
 
-module.exports = { getNewId, connectDb, disconnectDb, executeWithDbContext };
+module.exports = {
+    getNewId,
+    isConnected,
+    connectDb,
+    disconnectDb,
+    executeWithDbContext,
+};
