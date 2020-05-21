@@ -49,4 +49,6 @@ const executeWithDbContext = async (callback, raiseerror) => {
     }
 };
 
-module.exports = { connectDb, disconnectDb, executeWithDbContext };
+const getNewId = () => new mongoose.mongo.ObjectID();
+
+module.exports = { getNewId, connectDb, disconnectDb, executeWithDbContext };

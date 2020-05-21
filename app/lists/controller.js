@@ -189,17 +189,23 @@ const patch = async (req, res) => {
             case 'add':
                 //add an item under the current list
                 const itemCount = listItem.items.length;
-
-                listItem.items.push({
+                const newItem = {
+                    _id: utils.db.getNewId(),
                     name: data.value,
                     quantity: 1,
                     bought: false,
-                });
+                };
+
+                listItem.items.push(newItem);
                 listItem.updateDate = Date.now();
                 const dbResponse = await listItem.save();
+
                 //validate that one additional item was added to the collection
                 if (dbResponse.items.length === itemCount + 1) {
-                    return utils.response.sendSuccess(res, 'Success');
+                    return utils.response.sendSuccess(res, {
+                        message: 'Success',
+                        itemId: newItem._id,
+                    });
                 }
                 break;
 
