@@ -33,29 +33,43 @@ const getAll = async (req, res) => {
     if (process.env.NODE_ENV === 'test') {
         data = sampleRecipeData;
     } else {
-        data = await axios.get(searchUrl).then((res) => {
-            if (res.data && res.data.hits) {
-                //console.log(res.data.hits);
-                res.data.hits.map((item) => {
-                    data.push({
-                        label: item.recipe.label,
-                        source: item.recipe.source,
-                        url: item.recipe.url,
-                        image: item.recipe.image,
-                        yield: item.recipe.yield,
-                        totalTime: item.recipe.totalTime,
-                        calories: item.recipe.calories,
-                        totalWeight: item.recipe.totalWeight,
-                        source: item.recipe.source,
-                        ingredientLines: item.recipe.ingredientLines,
-                        healthLabels: item.recipe.healthLabels,
-                    });
-                });
+        data = await axios
+            .get(searchUrl)
+            .then((res) => {
+                if (res.data && res.data.hits) {
+                    //console.log(res.data.hits);
+                    res.data.hits.map((item) => {
+                        const recipe = item.recipe;
+                        const servings = recipe.yield;
+                        const totalCalories = recipe.calories;
+                        let caloriesperserving = null;
+                        if (servings && totalCalories) {
+                            caloriesperserving = totalCalories / servings;
+                        }
 
-                return data;
-            }
-            return null;
-        });
+                        data.push({
+                            label: recipe.label,
+                            source: recipe.source,
+                            url: recipe.url,
+                            image: recipe.image,
+                            yield: servings,
+                            totalTime: recipe.totalTime,
+                            caloriesPerServing: caloriesperserving,
+                            totalWeight: recipe.totalWeight,
+                            source: recipe.source,
+                            ingredientLines: recipe.ingredientLines,
+                            healthLabels: recipe.healthLabels,
+                        });
+                    });
+
+                    return data;
+                }
+                return null;
+            })
+            .catch((err) => {
+                console.log(err);
+                return err.message;
+            });
     }
 
     return utils.response.sendSuccess(res, data);
