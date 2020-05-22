@@ -194,6 +194,39 @@ describe('Users route related tests', () => {
                     });
             });
 
+            it.skip('should be able to login regardless of the email case', async () => {
+                const data = {
+                    name: 'Test User',
+                    email: 'test@mailinator.com',
+                    password: 'test1234',
+                };
+
+                //create the user
+                await utils.request
+                    .post('/users/register', data)
+                    .expect(httpStatusCodes.CREATED);
+                console.log('User created');
+                //login with that user
+                const logindata = {
+                    email: data.email,
+                    password: data.password,
+                };
+                await utils.request
+                    .post(route, logindata)
+                    .expect(httpStatusCodes.OK)
+                    .expect((res) => {
+                        expect(res.body.data).to.have.property('token');
+                    });
+
+                logindata.email = logindata.email.toUpperCase();
+                await utils.request
+                    .post(route, logindata)
+                    .expect(httpStatusCodes.OK)
+                    .expect((res) => {
+                        expect(res.body.data).to.have.property('token');
+                    });
+            });
+
             it.skip('should not allow invalid credentials', async () => {
                 const data = {
                     name: 'Test User',

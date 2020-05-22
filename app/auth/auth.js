@@ -26,7 +26,7 @@ const signup = async (req, res) => {
     const encryptedPassword = await encryptPassword(req.body.password);
 
     return await executeAndRespond(res, async () => {
-        const reqemail = req.body.email;
+        const reqemail = req.body.email.toLowerCase();
 
         const dbuser = await User.findOne({ email: reqemail });
         const user = new User({
@@ -60,6 +60,8 @@ const login = async (req, res) => {
         return utils.response.sendBadRequest(res, error.details[0].message);
     }
 
+    //convert the email to lower case to ensure case insensitive search
+    logindata.email = logindata.email.toLowerCase();
     return await executeAndRespond(res, async () => {
         const user = await User.findOne({ email: logindata.email });
         if (!user) {
